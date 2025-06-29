@@ -69,8 +69,15 @@
 
         $(function () {
             $('form').submit(function () {
-                const category    = $('select[name="category"]').val();
+                const category = $('select[name="category"]').val();
                 const money = $('input[name="money"]').val();
+                
+                // 数値チェックを追加
+                if (!/^\d+$/.test(money)) {
+                    alert('金額には数値のみを入力してください');
+                    return false;
+                }
+                
                 const msg = `${category}\n${money}`;
                 sendText(msg);
                 return false;
