@@ -1,0 +1,6 @@
+# macOS
+.DS_Store
+
+# GASで管理するファイル
+**/*.js
+**/*.json
