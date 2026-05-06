@@ -1,167 +1,221 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>家計簿入力</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+    />
     <style>
-        body { background-color: #f8f9fa; }
-        .card { border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .btn-line { background-color: #00B900; border-color: #00B900; color: #fff; }
-        .btn-line:hover { background-color: #009900; border-color: #009900; color: #fff; }
+      body {
+        background-color: #f8f9fa;
+      }
+      .card {
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+      .btn-line {
+        background-color: #00b900;
+        border-color: #00b900;
+        color: #fff;
+      }
+      .btn-line:hover {
+        background-color: #009900;
+        border-color: #009900;
+        color: #fff;
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <!-- ローディング -->
     <div id="loading" class="text-center mt-5">
-        <div class="spinner-border text-success" role="status">
-            <span class="sr-only">読み込み中...</span>
-        </div>
-        <p class="mt-2 text-muted">読み込み中...</p>
+      <div class="spinner-border text-success" role="status">
+        <span class="sr-only">読み込み中...</span>
+      </div>
+      <p class="mt-2 text-muted">読み込み中...</p>
     </div>
 
     <!-- エラー -->
-    <div id="error" class="container mt-4" style="display:none;">
-        <div class="alert alert-danger" id="error-message" role="alert"></div>
+    <div id="error" class="container mt-4" style="display: none">
+      <div class="alert alert-danger" id="error-message" role="alert"></div>
     </div>
 
     <!-- フォーム -->
-    <div id="app" class="container mt-4" style="display:none;">
-        <div class="card p-4">
-            <h5 class="mb-3">家計簿入力</h5>
-            <form id="expense-form" novalidate>
-                <div class="form-group">
-                    <label for="category">項目</label>
-                    <select class="form-control" id="category" name="category" required>
-                        <option value="">選択してください</option>
-                        <option value="食費">食費</option>
-                        <option value="外食費">外食費</option>
-                        <option value="日用品費">日用品費</option>
-                        <option value="交通費">交通費</option>
-                        <option value="医療費">医療費</option>
-                        <option value="交際費">交際費</option>
-                        <option value="雑費">雑費</option>
-                        <option value="娯楽費">娯楽費</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="memo">内容（任意・50文字以内）</label>
-                    <input class="form-control" id="memo" name="memo" type="text" maxlength="50" placeholder="例：スーパー">
-                </div>
-                <div class="form-group">
-                    <label for="money">金額（円）</label>
-                    <input class="form-control" id="money" name="money" type="number" min="1" max="9999999" step="1" required>
-                </div>
-                <button type="submit" class="btn btn-line btn-block mt-2" id="submit-btn">
-                    送信
-                </button>
-            </form>
-        </div>
+    <div id="app" class="container mt-4" style="display: none">
+      <div class="card p-4">
+        <h5 class="mb-3">家計簿入力</h5>
+        <form id="expense-form" novalidate>
+          <div class="form-group">
+            <label for="category">項目</label>
+            <select class="form-control" id="category" name="category" required>
+              <option value="">選択してください</option>
+              <option value="食費">食費</option>
+              <option value="外食費">外食費</option>
+              <option value="日用品費">日用品費</option>
+              <option value="交通費">交通費</option>
+              <option value="医療費">医療費</option>
+              <option value="交際費">交際費</option>
+              <option value="雑費">雑費</option>
+              <option value="娯楽費">娯楽費</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="memo">内容（任意・50文字以内）</label>
+            <input
+              class="form-control"
+              id="memo"
+              name="memo"
+              type="text"
+              maxlength="50"
+              placeholder="例：スーパー"
+            />
+          </div>
+          <div class="form-group">
+            <label for="money">金額（円）</label>
+            <input
+              class="form-control"
+              id="money"
+              name="money"
+              type="number"
+              min="1"
+              max="9999999"
+              step="1"
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            class="btn btn-line btn-block mt-2"
+            id="submit-btn"
+          >
+            送信
+          </button>
+        </form>
+      </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <script>
-        const LIFF_ID = "<?= liffId ?>";
-        const ALLOWED_CATEGORIES = ["食費", "外食費", "日用品費", "交通費", "医療費", "交際費", "雑費", "娯楽費"];
-        const MAX_AMOUNT = 9999999;
-        const MAX_MEMO_LENGTH = 50;
+      const LIFF_ID = "2007577762-xwlANOdD";
+      const ALLOWED_CATEGORIES = [
+        "食費",
+        "外食費",
+        "日用品費",
+        "交通費",
+        "医療費",
+        "交際費",
+        "雑費",
+        "娯楽費",
+      ];
+      const MAX_AMOUNT = 9999999;
+      const MAX_MEMO_LENGTH = 50;
 
-        let isSubmitting = false;
+      let isSubmitting = false;
 
-        function showLoading() {
-            $('#loading').show();
-            $('#app, #error').hide();
+      function showLoading() {
+        $("#loading").show();
+        $("#app, #error").hide();
+      }
+
+      function showApp() {
+        $("#loading, #error").hide();
+        $("#app").show();
+      }
+
+      function showError(message) {
+        $("#loading, #app").hide();
+        $("#error").show();
+        document.getElementById("error-message").textContent = message;
+      }
+
+      function sanitize(str) {
+        return String(str)
+          .replace(/[<>&"'`]/g, "")
+          .trim();
+      }
+
+      function validate(category, memo, money) {
+        if (!ALLOWED_CATEGORIES.includes(category)) {
+          return "無効な項目が選択されています。";
         }
-
-        function showApp() {
-            $('#loading, #error').hide();
-            $('#app').show();
+        if (memo.length > MAX_MEMO_LENGTH) {
+          return `内容は${MAX_MEMO_LENGTH}文字以内で入力してください。`;
         }
-
-        function showError(message) {
-            $('#loading, #app').hide();
-            $('#error').show();
-            document.getElementById('error-message').textContent = message;
+        const amount = parseInt(money, 10);
+        if (
+          isNaN(amount) ||
+          amount <= 0 ||
+          amount > MAX_AMOUNT ||
+          String(amount) !== String(money.trim())
+        ) {
+          return `金額は1〜${MAX_AMOUNT.toLocaleString()}円の整数で入力してください。`;
         }
+        return null;
+      }
 
-        function sanitize(str) {
-            return String(str).replace(/[<>&"'`]/g, '').trim();
-        }
+      $(document).ready(function () {
+        showLoading();
 
-        function validate(category, memo, money) {
-            if (!ALLOWED_CATEGORIES.includes(category)) {
-                return '無効な項目が選択されています。';
+        const initTimeout = setTimeout(function () {
+          showError("このフォームはLINEアプリ内でのみご利用いただけます。");
+        }, 5000);
+
+        liff
+          .init({ liffId: LIFF_ID })
+          .then(function () {
+            clearTimeout(initTimeout);
+            if (!liff.isInClient()) {
+              showError("このフォームはLINEアプリ内でのみご利用いただけます。");
+              return;
             }
-            if (memo.length > MAX_MEMO_LENGTH) {
-                return `内容は${MAX_MEMO_LENGTH}文字以内で入力してください。`;
+            if (!liff.isLoggedIn()) {
+              liff.login();
+              return;
             }
-            const amount = parseInt(money, 10);
-            if (isNaN(amount) || amount <= 0 || amount > MAX_AMOUNT || String(amount) !== String(money.trim())) {
-                return `金額は1〜${MAX_AMOUNT.toLocaleString()}円の整数で入力してください。`;
-            }
-            return null;
-        }
+            showApp();
+          })
+          .catch(function () {
+            clearTimeout(initTimeout);
+            showError(
+              "初期化に失敗しました。LINEアプリを再起動してお試しください。",
+            );
+          });
 
-        $(document).ready(function () {
-            showLoading();
+        $("#expense-form").submit(function (e) {
+          e.preventDefault();
 
-            const initTimeout = setTimeout(function () {
-                showError('このフォームはLINEアプリ内でのみご利用いただけます。');
-            }, 5000);
+          if (isSubmitting) return;
 
-            liff.init({ liffId: LIFF_ID })
-                .then(function () {
-                    clearTimeout(initTimeout);
-                    if (!liff.isInClient()) {
-                        showError('このフォームはLINEアプリ内でのみご利用いただけます。');
-                        return;
-                    }
-                    if (!liff.isLoggedIn()) {
-                        liff.login();
-                        return;
-                    }
-                    showApp();
-                })
-                .catch(function () {
-                    clearTimeout(initTimeout);
-                    showError('初期化に失敗しました。LINEアプリを再起動してお試しください。');
-                });
+          const category = sanitize($("#category").val());
+          const memo = sanitize($("#memo").val());
+          const money = sanitize($("#money").val());
 
-            $('#expense-form').submit(function (e) {
-                e.preventDefault();
+          const error = validate(category, memo, money);
+          if (error) {
+            alert(error);
+            return;
+          }
 
-                if (isSubmitting) return;
+          isSubmitting = true;
+          $("#submit-btn").prop("disabled", true).text("送信中...");
 
-                const category = sanitize($('#category').val());
-                const memo = sanitize($('#memo').val());
-                const money = sanitize($('#money').val());
+          const msg = category + "\n" + memo + "\n" + parseInt(money, 10);
 
-                const error = validate(category, memo, money);
-                if (error) {
-                    alert(error);
-                    return;
-                }
-
-                isSubmitting = true;
-                $('#submit-btn').prop('disabled', true).text('送信中...');
-
-                const msg = category + '\n' + memo + '\n' + parseInt(money, 10);
-
-                liff.sendMessages([{ type: 'text', text: msg }])
-                    .then(function () {
-                        liff.closeWindow();
-                    })
-                    .catch(function () {
-                        alert('送信に失敗しました。もう一度お試しください。');
-                        isSubmitting = false;
-                        $('#submit-btn').prop('disabled', false).text('送信');
-                    });
+          liff
+            .sendMessages([{ type: "text", text: msg }])
+            .then(function () {
+              liff.closeWindow();
+            })
+            .catch(function () {
+              alert("送信に失敗しました。もう一度お試しください。");
+              isSubmitting = false;
+              $("#submit-btn").prop("disabled", false).text("送信");
             });
         });
+      });
     </script>
-
-</body>
+  </body>
 </html>
