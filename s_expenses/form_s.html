@@ -156,8 +156,34 @@
         return null;
       }
 
+      const DEBUG = new URLSearchParams(location.search).get("debug") === "true";
+
+      function sendMessage(msg) {
+        if (DEBUG) {
+          alert("[デバッグ] 送信内容:\n" + msg);
+          isSubmitting = false;
+          $("#submit-btn").prop("disabled", false).text("送信");
+          return;
+        }
+        liff
+          .sendMessages([{ type: "text", text: msg }])
+          .then(function () {
+            liff.closeWindow();
+          })
+          .catch(function () {
+            alert("送信に失敗しました。もう一度お試しください。");
+            isSubmitting = false;
+            $("#submit-btn").prop("disabled", false).text("送信");
+          });
+      }
+
       $(document).ready(function () {
         showLoading();
+
+        if (DEBUG) {
+          showApp();
+          return;
+        }
 
         const initTimeout = setTimeout(function () {
           showError("このフォームはLINEアプリ内でのみご利用いただけます。");
@@ -202,18 +228,7 @@
           isSubmitting = true;
           $("#submit-btn").prop("disabled", true).text("送信中...");
 
-          const msg = category + "\n" + memo + "\n" + parseInt(money, 10);
-
-          liff
-            .sendMessages([{ type: "text", text: msg }])
-            .then(function () {
-              liff.closeWindow();
-            })
-            .catch(function () {
-              alert("送信に失敗しました。もう一度お試しください。");
-              isSubmitting = false;
-              $("#submit-btn").prop("disabled", false).text("送信");
-            });
+          sendMessage(category + "\n" + memo + "\n" + parseInt(money, 10));
         });
       });
     </script>
