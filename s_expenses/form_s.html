@@ -180,6 +180,27 @@
       $(document).ready(function () {
         showLoading();
 
+        $("#expense-form").submit(function (e) {
+          e.preventDefault();
+
+          if (isSubmitting) return;
+
+          const category = sanitize($("#category").val());
+          const memo = sanitize($("#memo").val());
+          const money = sanitize($("#money").val());
+
+          const error = validate(category, memo, money);
+          if (error) {
+            alert(error);
+            return;
+          }
+
+          isSubmitting = true;
+          $("#submit-btn").prop("disabled", true).text("送信中...");
+
+          sendMessage(category + "\n" + memo + "\n" + parseInt(money, 10));
+        });
+
         if (DEBUG) {
           showApp();
           return;
@@ -209,27 +230,6 @@
               "初期化に失敗しました。LINEアプリを再起動してお試しください。",
             );
           });
-
-        $("#expense-form").submit(function (e) {
-          e.preventDefault();
-
-          if (isSubmitting) return;
-
-          const category = sanitize($("#category").val());
-          const memo = sanitize($("#memo").val());
-          const money = sanitize($("#money").val());
-
-          const error = validate(category, memo, money);
-          if (error) {
-            alert(error);
-            return;
-          }
-
-          isSubmitting = true;
-          $("#submit-btn").prop("disabled", true).text("送信中...");
-
-          sendMessage(category + "\n" + memo + "\n" + parseInt(money, 10));
-        });
       });
     </script>
   </body>
