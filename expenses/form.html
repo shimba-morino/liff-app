@@ -62,17 +62,6 @@
             </select>
           </div>
           <div class="form-group">
-            <label for="memo">内容（任意・50文字以内）</label>
-            <input
-              class="form-control"
-              id="memo"
-              name="memo"
-              type="text"
-              maxlength="50"
-              placeholder="例：スーパー"
-            />
-          </div>
-          <div class="form-group">
             <label for="money">金額（円）</label>
             <input
               class="form-control"
@@ -111,8 +100,6 @@
         "娯楽費",
       ];
       const MAX_AMOUNT = 9999999;
-      const MAX_MEMO_LENGTH = 50;
-
       let isSubmitting = false;
 
       function showLoading() {
@@ -139,12 +126,9 @@
           .trim();
       }
 
-      function validate(category, memo, money) {
+      function validate(category, money) {
         if (!ALLOWED_CATEGORIES.includes(category)) {
           return "無効な項目が選択されています。";
-        }
-        if (memo.length > MAX_MEMO_LENGTH) {
-          return `内容は${MAX_MEMO_LENGTH}文字以内で入力してください。`;
         }
         const amount = parseInt(money, 10);
         if (
@@ -195,10 +179,9 @@
           if (isSubmitting) return;
 
           const category = sanitize($("#category").val());
-          const memo = sanitize($("#memo").val());
           const money = sanitize($("#money").val());
 
-          const error = validate(category, memo, money);
+          const error = validate(category, money);
           if (error) {
             alert(error);
             return;
@@ -207,7 +190,7 @@
           isSubmitting = true;
           $("#submit-btn").prop("disabled", true).text("送信中...");
 
-          const msg = category + "\n" + memo + "\n" + parseInt(money, 10);
+          const msg = category + "\n" + parseInt(money, 10);
 
           liff
             .sendMessages([{ type: "text", text: msg }])
